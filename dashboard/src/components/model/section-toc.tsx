@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 export const MODEL_SECTIONS = [
   { id: "overview", label: "Overview" },
   { id: "business-questions", label: "Business questions" },
-  { id: "dataset", label: "Dataset" },
   { id: "features", label: "Features" },
   { id: "eda", label: "EDA highlights" },
   { id: "k-selection", label: "K selection" },

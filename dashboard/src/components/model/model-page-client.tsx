@@ -162,7 +162,7 @@ export function ModelPageClient() {
         <header>
           <h1 className="text-2xl font-semibold text-ink text-balance">Model details</h1>
           <p className="mt-2 max-w-prose text-sm text-muted">
-            Notebook pipeline validation — dataset provenance, feature engineering, k-selection,
+            Notebook pipeline validation — feature engineering, k-selection,
             algorithm comparison, and persona definitions grounded in saved artifacts.
           </p>
           <dl className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -219,42 +219,6 @@ export function ModelPageClient() {
               </li>
             ))}
           </ol>
-        </SectionPanel>
-
-        <SectionPanel
-          id="dataset"
-          title="Dataset & cleaning"
-          description={`Source: ${data.dataset.source}. Behavioral and account features merged for segmentation.`}
-        >
-          <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <dt className="text-xs font-medium text-muted">Raw shape</dt>
-              <dd className="mt-1 text-ink">
-                {data.dataset.raw_rows.toLocaleString()} × {data.dataset.raw_columns}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium text-muted">Working columns</dt>
-              <dd className="mt-1 text-ink">{data.dataset.working_columns}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium text-muted">Duplicate rows</dt>
-              <dd className="mt-1 text-ink">{data.dataset.duplicate_rows}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium text-muted">Missing values</dt>
-              <dd className="mt-1 text-sm text-ink">
-                {data.dataset.missing_values
-                  .map((m) => `${m.column} (${m.count})`)
-                  .join(", ")}
-              </dd>
-            </div>
-          </dl>
-          <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-muted">
-            {data.dataset.cleaning_notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
         </SectionPanel>
 
         <SectionPanel
