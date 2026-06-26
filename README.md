@@ -72,7 +72,6 @@ A credit card issuer has thousands of customers with different spending, payment
 | Path | Purpose |
 |------|---------|
 | `credit_card_customer_clustering.ipynb` | Full ML pipeline — cleaning, EDA, features, clustering, evaluation, artifact export |
-| `NOTEBOOK_WALKTHROUGH.md` | Cell-by-cell guide to the notebook (code, charts, plain-language explanations) |
 | `api/` | FastAPI inference service (`/api/v1/segment`, `/personas`, `/cluster-map`, `/model-details`) |
 | `dashboard/` | Next.js Segment Console UI |
 | `artifacts/` | Deployed model files (committed so Docker/API work out of the box) |
@@ -105,8 +104,6 @@ The notebook `credit_card_customer_clustering.ipynb` runs these sections:
 | **8. Artifacts** | Save to `artifacts/` for API inference |
 
 **Re-run notebook:** place `CC GENERAL.csv` in `Dataset/`, run all cells, then redeploy API if artifacts change.
-
-**Detailed guide:** see [`NOTEBOOK_WALKTHROUGH.md`](NOTEBOOK_WALKTHROUGH.md).
 
 ---
 
@@ -283,7 +280,6 @@ The repo includes **cleaned data and model artifacts** so the API and dashboard 
 
 | Doc | Contents |
 |-----|----------|
-| [`NOTEBOOK_WALKTHROUGH.md`](NOTEBOOK_WALKTHROUGH.md) | Full notebook explained cell-by-cell |
 | [`PRODUCT.md`](PRODUCT.md) | Users, personas, product principles |
 | [`DESIGN.md`](DESIGN.md) | UI/UX design system |
 | [`api/README.md`](api/README.md) | API-specific notes |
