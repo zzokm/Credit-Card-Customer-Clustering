@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-:root {
+:root,
+[data-theme="light"] {
   --canvas: oklch(1 0 0);
   --surface: oklch(0.97 0.008 220);
   --ink: oklch(0.22 0.02 220);
@@ -12,10 +13,28 @@
   --persona-0: oklch(0.55 0.06 250);
   --persona-1: oklch(0.62 0.14 165);
   --persona-2: oklch(0.58 0.16 25);
+  --bg-veil-top: oklch(1 0 0 / 0.55);
+  --bg-veil-bottom: oklch(1 0 0 / 0.82);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --z-sticky: 10;
   --z-drawer: 40;
   --z-drawer-backdrop: 30;
+}
+
+[data-theme="dark"] {
+  --canvas: oklch(0.16 0.018 220);
+  --surface: oklch(0.22 0.02 220);
+  --ink: oklch(0.93 0.01 220);
+  --muted: oklch(0.68 0.015 220);
+  --primary: oklch(0.62 0.14 215);
+  --primary-hover: oklch(0.68 0.14 215);
+  --border: oklch(0.93 0.01 220 / 0.12);
+  --ring: oklch(0.62 0.14 215 / 0.45);
+  --persona-0: oklch(0.62 0.08 250);
+  --persona-1: oklch(0.68 0.15 165);
+  --persona-2: oklch(0.65 0.17 25);
+  --bg-veil-top: oklch(0.16 0.018 220 / 0.45);
+  --bg-veil-bottom: oklch(0.16 0.018 220 / 0.78);
 }
 
 @theme inline {
@@ -45,6 +64,205 @@ body {
   font-family: var(--font-source-sans), system-ui, sans-serif;
   font-size: 0.9375rem;
   line-height: 1.5;
+  transition:
+    background-color 0.25s var(--ease-out),
+    color 0.25s var(--ease-out);
+}
+
+/* ── Dynamic background ───────────────────────────────────────────── */
+
+.dynamic-bg {
+  background: var(--canvas);
+  transition: background-color 0.25s var(--ease-out);
+}
+
+.dynamic-bg__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--bg-veil-top) 0%,
+    var(--bg-veil-bottom) 100%
+  );
+}
+
+.dynamic-bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.42;
+  will-change: transform;
+}
+
+[data-theme="dark"] .dynamic-bg__blob {
+  opacity: 0.28;
+}
+
+.dynamic-bg__blob--0 {
+  top: -12%;
+  left: -8%;
+  width: 52vw;
+  height: 52vw;
+  max-width: 36rem;
+  max-height: 36rem;
+  background: var(--persona-0);
+  animation: bg-blob-drift-a 22s ease-in-out infinite;
+}
+
+.dynamic-bg__blob--1 {
+  top: 28%;
+  right: -10%;
+  width: 48vw;
+  height: 48vw;
+  max-width: 32rem;
+  max-height: 32rem;
+  background: var(--persona-1);
+  animation: bg-blob-drift-b 26s ease-in-out infinite;
+}
+
+.dynamic-bg__blob--2 {
+  bottom: -14%;
+  left: 22%;
+  width: 44vw;
+  height: 44vw;
+  max-width: 30rem;
+  max-height: 30rem;
+  background: var(--persona-2);
+  animation: bg-blob-drift-c 20s ease-in-out infinite;
+}
+
+.dynamic-bg__flow {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.2;
+  will-change: transform;
+}
+
+[data-theme="dark"] .dynamic-bg__flow {
+  opacity: 0.14;
+}
+
+.dynamic-bg__flow--a {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    var(--persona-0),
+    var(--persona-1),
+    var(--persona-2),
+    var(--primary),
+    var(--persona-0)
+  );
+  animation: bg-flow-spin 28s linear infinite;
+}
+
+.dynamic-bg__flow--b {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    var(--persona-1) 0%,
+    transparent 70%
+  );
+  opacity: 0.35;
+  animation: bg-flow-pulse 14s ease-in-out infinite;
+}
+
+.dynamic-bg__grid {
+  position: absolute;
+  inset: -40%;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  opacity: 0.55;
+  animation: bg-grid-pan 48s linear infinite;
+}
+
+[data-theme="dark"] .dynamic-bg__grid {
+  opacity: 0.35;
+}
+
+.dynamic-bg__grid-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  width: min(70vw, 40rem);
+  height: min(70vw, 40rem);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 68%);
+  opacity: 0.12;
+  filter: blur(40px);
+  animation: bg-grid-glow 10s ease-in-out infinite;
+}
+
+@keyframes bg-blob-drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8%, 10%) scale(1.1);
+  }
+}
+
+@keyframes bg-blob-drift-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-10%, 6%) scale(1.06);
+  }
+}
+
+@keyframes bg-blob-drift-c {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(6%, -8%) scale(1.08);
+  }
+}
+
+@keyframes bg-flow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bg-flow-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.45;
+  }
+}
+
+@keyframes bg-grid-pan {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(3rem, 3rem);
+  }
+}
+
+@keyframes bg-grid-glow {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: translateX(-50%) scale(1.12);
+  }
 }
 
 ::selection {

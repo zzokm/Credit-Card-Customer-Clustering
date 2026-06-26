@@ -6,6 +6,7 @@ import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiStatusIndicator } from "@/components/shell/api-status-indicator";
+import { ThemeControls } from "@/components/shell/theme-controls";
 
 const NAV = [
   { href: "/lookup", label: "Segment lookup" },
@@ -50,6 +51,7 @@ export function TopNav({ onOpenModel }: TopNavProps) {
             );
           })}
         </nav>
+        <ThemeControls />
         <ApiStatusIndicator />
         <Button
           variant="secondary"
