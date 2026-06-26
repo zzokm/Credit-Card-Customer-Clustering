@@ -11,9 +11,9 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import { fetchClusterMap } from "@/lib/api";
-import type { ClusterPoint, SegmentResult } from "@/lib/types";
-import { PERSONA_COLORS, personaHighlightColor } from "@/lib/personas";
+import { fetchClusterMap, fetchPersonas } from "@/lib/api";
+import type { ClusterPoint, PersonaRow, SegmentResult } from "@/lib/types";
+import { PERSONA_COLORS, personaColor, personaHighlightColor } from "@/lib/personas";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { useSegmentHighlight } from "@/context/segment-highlight-context";
@@ -63,6 +63,7 @@ function LookupTooltipContent({ result }: { result: SegmentResult }) {
 
 export function ClusterScatter() {
   const [points, setPoints] = useState<ClusterPoint[]>([]);
+  const [personas, setPersonas] = useState<PersonaRow[]>([]);
   const [total, setTotal] = useState(0);
   const [simplified, setSimplified] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,12 @@ export function ClusterScatter() {
   const [filter, setFilter] = useState<number | "all">("all");
   const [selected, setSelected] = useState<ClusterPoint | null>(null);
   const { highlight, clearHighlight } = useSegmentHighlight();
+
+  useEffect(() => {
+    fetchPersonas()
+      .then((data) => setPersonas(data.personas))
+      .catch(() => setPersonas([]));
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -97,6 +104,28 @@ export function ClusterScatter() {
       fill: PERSONA_COLORS[p.cluster_id] ?? "oklch(0.5 0.05 220)",
     }));
   }, [points, filter]);
+
+  const legendItems = useMemo(() => {
+    if (personas.length > 0) {
+      return [...personas].sort((a, b) => a.cluster_id - b.cluster_id);
+    }
+    const counts = new Map<number, { count: number; name: string }>();
+    for (const p of points) {
+      const prev = counts.get(p.cluster_id);
+      counts.set(p.cluster_id, {
+        count: (prev?.count ?? 0) + 1,
+        name: p.persona_name,
+      });
+    }
+    const n = points.length || 1;
+    return [...counts.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([cluster_id, { count, name }]) => ({
+        cluster_id,
+        persona_name: name,
+        pct_of_base: Math.round((count / n) * 1000) / 10,
+      }));
+  }, [personas, points]);
 
   const lookupScatterData = useMemo((): LookupScatterDatum[] => {
     if (!highlight) return [];
@@ -155,6 +184,29 @@ export function ClusterScatter() {
           </Button>
         )}
       </div>
+
+      {legendItems.length > 0 && (
+        <ul
+          className="flex flex-wrap gap-x-5 gap-y-2 text-sm"
+          aria-label="Persona color legend"
+        >
+          {legendItems.map((row) => (
+            <li key={row.cluster_id} className="flex items-center gap-2">
+              <span
+                className="inline-flex size-2.5 shrink-0 rounded-full"
+                style={{ background: personaColor(row.cluster_id) }}
+                aria-hidden
+              />
+              <span className="text-ink">
+                {row.persona_name.replace(/^The /, "")}
+              </span>
+              <span className="font-mono text-xs tabular-nums text-muted">
+                {row.pct_of_base}%
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="h-[min(520px,60vh)] rounded-lg border border-border bg-canvas p-2">
         {loading && (

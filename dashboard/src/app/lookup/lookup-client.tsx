@@ -78,16 +78,15 @@ export function LookupPageClient() {
             errors={errors}
           />
         </div>
-        <aside className="lg:sticky lg:top-20">
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           <VisaCard
             clusterId={result?.cluster_id ?? null}
             segmentName={result?.segment_name}
             loading={loading && !result}
           />
+          <SegmentResultPanel result={result} error={error} />
         </aside>
       </div>
-
-      <SegmentResultPanel result={result} error={error} />
     </div>
   );
 }
