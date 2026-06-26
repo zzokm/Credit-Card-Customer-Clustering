@@ -54,6 +54,20 @@ export async function fetchMetadata(): Promise<ModelMetadata> {
   return fetchJson("/api/v1/metadata");
 }
 
+export async function fetchHealth(): Promise<{ status: string }> {
+  return fetchJson("/api/v1/health");
+}
+
+/** True when API responds and model artifacts are loaded. */
+export async function checkApiLive(): Promise<boolean> {
+  try {
+    const [health, meta] = await Promise.all([fetchHealth(), fetchMetadata()]);
+    return health.status === "ok" && Boolean(meta.best_model);
+  } catch {
+    return false;
+  }
+}
+
 export async function fetchModelDetails(): Promise<ModelDetails> {
   return fetchJson("/api/v1/model-details");
 }

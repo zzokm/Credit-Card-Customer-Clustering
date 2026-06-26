@@ -9,6 +9,7 @@ type VisaCardProps = {
   clusterId?: number | null;
   segmentName?: string | null;
   loading?: boolean;
+  pulseTick?: number;
   className?: string;
 };
 
@@ -32,6 +33,7 @@ export function VisaCard({
   clusterId = null,
   segmentName,
   loading = false,
+  pulseTick = 0,
   className,
 }: VisaCardProps) {
   const tint = personaBg(clusterId);
@@ -40,6 +42,14 @@ export function VisaCard({
   const [motion, setMotion] = useState<CardMotion>(IDLE_MOTION);
   const [hovering, setHovering] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [pulsing, setPulsing] = useState(false);
+
+  useEffect(() => {
+    if (pulseTick < 1 || loading || reduceMotion) return;
+    setPulsing(true);
+    const t = window.setTimeout(() => setPulsing(false), 1400);
+    return () => window.clearTimeout(t);
+  }, [pulseTick, loading, reduceMotion]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -102,11 +112,13 @@ export function VisaCard({
           className={cn(
             "relative aspect-[1.586/1] overflow-hidden rounded-2xl border border-border p-6 shadow-[0_8px_32px_oklch(0.22_0.02_220_/_0.1)] will-change-transform",
             loading && "animate-pulse",
+            pulsing && "visa-persona-pulse",
             !reduceMotion && !loading && "group-hover/card:shadow-[0_16px_48px_oklch(0.22_0.02_220_/_0.14)]",
           )}
           style={{
             ...tiltStyle,
             background: `linear-gradient(148deg, ${tint} 0%, oklch(0.99 0.004 220) 48%, ${tint} 100%)`,
+            ["--visa-pulse-color" as string]: pulsing ? `${accent}99` : undefined,
             transition: tiltStyle?.transition
               ? `${tiltStyle.transition}, background 300ms var(--ease-out), box-shadow 300ms var(--ease-out)`
               : undefined,
@@ -114,7 +126,10 @@ export function VisaCard({
         >
           {/* Persona ambient */}
           <div
-            className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full opacity-25 blur-2xl transition-colors duration-300"
+            className={cn(
+              "pointer-events-none absolute -right-10 -top-10 size-44 rounded-full opacity-25 blur-2xl transition-all duration-300",
+              pulsing && !reduceMotion && "scale-110 opacity-40",
+            )}
             style={{ background: accent }}
           />
 

@@ -20,6 +20,7 @@ export function LookupPageClient() {
   const [result, setResult] = useState<SegmentResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pulseTick, setPulseTick] = useState(0);
   const { setHighlight } = useSegmentHighlight();
 
   const runSegmentation = useCallback(async () => {
@@ -33,6 +34,7 @@ export function LookupPageClient() {
       const res = await predictSegment(values);
       setResult(res);
       setHighlight(res);
+      setPulseTick((t) => t + 1);
     } catch {
       setResult(null);
       setError(
@@ -83,6 +85,7 @@ export function LookupPageClient() {
             clusterId={result?.cluster_id ?? null}
             segmentName={result?.segment_name}
             loading={loading && !result}
+            pulseTick={pulseTick}
           />
           <SegmentResultPanel result={result} error={error} />
         </aside>

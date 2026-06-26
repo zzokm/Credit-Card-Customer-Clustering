@@ -55,3 +55,25 @@ body {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
+
+@keyframes visa-persona-reveal {
+  0% {
+    box-shadow:
+      0 8px 32px oklch(0.22 0.02 220 / 0.1),
+      0 0 0 0 var(--visa-pulse-color, transparent);
+  }
+  45% {
+    box-shadow:
+      0 16px 48px oklch(0.22 0.02 220 / 0.16),
+      0 0 32px 8px var(--visa-pulse-color, transparent);
+  }
+  100% {
+    box-shadow:
+      0 8px 32px oklch(0.22 0.02 220 / 0.1),
+      0 0 0 0 transparent;
+  }
+}
+
+.visa-persona-pulse {
+  animation: visa-persona-reveal 1.4s var(--ease-out) 1;
+}
