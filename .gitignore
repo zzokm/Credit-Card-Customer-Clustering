@@ -51,6 +51,7 @@ Epsilon AI Criteria/
 visuals/
 *.ipynb
 _executed.ipynb
+!credit_card_customer_clustering.ipynb
 /requirements.txt
 
 # Notebook / EDA outputs not required for inference API
