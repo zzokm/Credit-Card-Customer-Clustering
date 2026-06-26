@@ -345,6 +345,8 @@ class ArtifactStore:
                     "calinski_harabasz": km_metrics.get("calinski_harabasz", {}).get(model_name),
                     "n_clusters": km_metrics.get("n_clusters", {}).get(model_name),
                     "noise_pct": km_metrics.get("noise_pct", {}).get(model_name),
+                    "rank_db": km_metrics.get("rank_db", {}).get(model_name),
+                    "rank_sil": km_metrics.get("rank_sil", {}).get(model_name),
                     "composite_rank": km_metrics.get("composite_rank", {}).get(model_name),
                 }
             )

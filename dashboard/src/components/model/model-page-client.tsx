@@ -14,6 +14,14 @@ import {
   PersonaProfileRadar,
   ZeroInflationChart,
 } from "@/components/model/model-charts";
+import {
+  BUSINESS_QUESTIONS,
+  CLUSTERING_ALGORITHMS,
+  ENGINEERED_FEATURES,
+  METRIC_DEFINITIONS,
+  RAW_FEATURE_DEFINITIONS,
+} from "@/lib/model-content";
+import { PERSONA_DETAILS } from "@/lib/persona-detail-content";
 
 function SectionPanel({
   id,
@@ -194,6 +202,26 @@ export function ModelPageClient() {
         </SectionPanel>
 
         <SectionPanel
+          id="business-questions"
+          title="Business questions"
+          description="The segmentation pipeline answers six FinTech policy questions that motivate feature engineering, clustering, and persona actions."
+        >
+          <ol className="space-y-4">
+            {BUSINESS_QUESTIONS.map((item, i) => (
+              <li key={item.title} className="flex gap-3 text-sm">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-surface font-mono text-xs font-medium text-muted">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-medium text-ink">{item.title}</p>
+                  <p className="mt-0.5 text-muted">{item.question}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </SectionPanel>
+
+        <SectionPanel
           id="dataset"
           title="Dataset & cleaning"
           description={`Source: ${data.dataset.source}. Behavioral and account features merged for segmentation.`}
@@ -234,39 +262,94 @@ export function ModelPageClient() {
           title="Features & engineering"
           description={`${data.features.api_input_count} API inputs expand to ${data.features.model_features.length} scaled model features after engineering and log1p transforms.`}
         >
-          <div className="space-y-6">
+          <div className="space-y-10">
             <div>
-              <h3 className="text-sm font-semibold text-ink">Spending behavior</h3>
-              <div className="mt-2">
-                <FeatureList items={data.features.groups.spending} />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-ink">Account & payments</h3>
-              <div className="mt-2">
-                <FeatureList items={data.features.groups.account} />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-ink">Engineered at inference</h3>
-              <div className="mt-2">
-                <FeatureList items={data.features.groups.engineered} />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-ink">log1p transform</h3>
+              <h3 className="text-sm font-semibold text-ink">Dataset columns (definitions)</h3>
               <p className="mt-1 text-sm text-muted">
-                Applied to skewed, zero-inflated columns before scaling — same order as the
-                notebook pipeline.
+                CC GENERAL raw fields in column order. CUST_ID is dropped before modeling;{" "}
+                PURCHASES_INSTALLMENTS_FREQUENCY is excluded during feature selection.
               </p>
-              <div className="mt-2">
-                <FeatureList items={data.features.log1p_columns} muted />
+              <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+                <table className="w-full min-w-[640px] text-left text-sm">
+                  <thead className="border-b border-border bg-surface">
+                    <tr>
+                      <th className="px-3 py-2 font-medium text-muted">Column</th>
+                      <th className="px-3 py-2 font-medium text-muted">Definition</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {RAW_FEATURE_DEFINITIONS.map((row) => (
+                      <tr key={row.column} className="border-t border-border/60">
+                        <td className="px-3 py-2 align-top font-mono text-xs text-ink">
+                          {row.column}
+                        </td>
+                        <td className="px-3 py-2 text-ink">{row.definition}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
+
             <div>
-              <h3 className="text-sm font-semibold text-ink">Full model feature set</h3>
-              <div className="mt-2">
-                <FeatureList items={data.features.model_features} />
+              <h3 className="text-sm font-semibold text-ink">Engineered features</h3>
+              <p className="mt-1 text-sm text-muted">
+                Created at inference time from raw inputs — same formulas as the notebook.
+              </p>
+              <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead className="border-b border-border bg-surface">
+                    <tr>
+                      <th className="px-3 py-2 font-medium text-muted">Feature</th>
+                      <th className="px-3 py-2 font-medium text-muted">Formula</th>
+                      <th className="px-3 py-2 font-medium text-muted">In simple terms</th>
+                      <th className="px-3 py-2 font-medium text-muted">Why it helps</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ENGINEERED_FEATURES.map((row) => (
+                      <tr key={row.name} className="border-t border-border/60">
+                        <td className="px-3 py-2 align-top font-mono text-xs text-ink">
+                          {row.name}
+                        </td>
+                        <td className="px-3 py-2 align-top text-ink">{row.formula}</td>
+                        <td className="px-3 py-2 align-top text-ink">{row.simple}</td>
+                        <td className="px-3 py-2 align-top text-muted">{row.useful}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="space-y-6 border-t border-border pt-8">
+              <div>
+                <h3 className="text-sm font-semibold text-ink">Spending behavior (API inputs)</h3>
+                <div className="mt-2">
+                  <FeatureList items={data.features.groups.spending} />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-ink">Account & payments (API inputs)</h3>
+                <div className="mt-2">
+                  <FeatureList items={data.features.groups.account} />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-ink">log1p transform</h3>
+                <p className="mt-1 text-sm text-muted">
+                  Applied to skewed, zero-inflated columns before scaling — same order as the
+                  notebook pipeline.
+                </p>
+                <div className="mt-2">
+                  <FeatureList items={data.features.log1p_columns} muted />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-ink">Full model feature set</h3>
+                <div className="mt-2">
+                  <FeatureList items={data.features.model_features} />
+                </div>
               </div>
             </div>
           </div>
@@ -317,53 +400,156 @@ export function ModelPageClient() {
 
         <SectionPanel
           id="validation"
-          title="Algorithm comparison"
-          description="K-Means++, DBSCAN, and Agglomerative clustering compared on the same scaled feature space. K-Means++ deployed for real-time .predict() and operational k bounds."
+          title="Algorithms & metrics"
+          description="Three clustering methods compared on the same scaled features. K-Means++ is deployed because it supports real-time .predict() for the API — not because it wins every metric."
         >
-          <div className="space-y-6">
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full min-w-[560px] text-left text-sm">
-                <thead className="border-b border-border bg-surface">
-                  <tr>
-                    <th className="px-3 py-2 font-medium text-muted">Model</th>
-                    <th className="px-3 py-2 font-medium text-muted text-right">Silhouette</th>
-                    <th className="px-3 py-2 font-medium text-muted text-right">Davies–B.</th>
-                    <th className="px-3 py-2 font-medium text-muted text-right">Clusters</th>
-                    <th className="px-3 py-2 font-medium text-muted text-right">Noise %</th>
-                    <th className="px-3 py-2 font-medium text-muted text-right">Rank</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.algorithm_comparison.map((row) => (
-                    <tr
-                      key={row.model}
-                      className={
-                        row.model === "K-Means"
-                          ? "bg-surface font-medium"
-                          : "border-t border-border/60"
-                      }
-                    >
-                      <td className="px-3 py-2 text-ink">{row.model}</td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">
-                        {row.silhouette?.toFixed(4) ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">
-                        {row.davies_bouldin?.toFixed(4) ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">
-                        {row.n_clusters ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">
-                        {row.noise_pct != null ? `${row.noise_pct.toFixed(2)}%` : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">
-                        {row.composite_rank ?? "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="space-y-10">
+            <div>
+              <h3 className="text-sm font-semibold text-ink">Clustering algorithms compared</h3>
+              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                {CLUSTERING_ALGORITHMS.map((algo) => (
+                  <article
+                    key={algo.name}
+                    className={`rounded-lg border p-4 ${
+                      algo.deployed
+                        ? "border-primary/30 bg-surface"
+                        : "border-border bg-canvas"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="font-semibold text-ink">{algo.name}</h4>
+                      {algo.deployed && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
+                          Deployed
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-muted">{algo.type}</p>
+                    <p className="mt-3 text-sm text-ink">{algo.summary}</p>
+                    <div className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <p className="font-medium text-muted">Strengths</p>
+                        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-ink">
+                          {algo.strengths.map((s) => (
+                            <li key={s}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-muted">Limitations</p>
+                        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-muted">
+                          {algo.weaknesses.map((w) => (
+                            <li key={w}>{w}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-ink">Hierarchical dendrogram (Ward linkage)</h3>
+              <p className="mt-1 text-sm text-muted">
+                Built on a 500-customer sample for readability. Shows how Agglomerative clustering
+                merges similar customers bottom-up. A horizontal cut at the chosen height yields k=3
+                segments — same k as K-Means for a fair comparison.
+              </p>
+              <figure className="mt-4 overflow-hidden rounded-lg border border-border bg-canvas p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/model/dendrogram.png"
+                  alt="Hierarchical clustering dendrogram with Ward linkage on a sample of credit card customers"
+                  className="mx-auto max-h-[420px] w-full object-contain"
+                />
+                <figcaption className="mt-2 text-center text-xs text-muted">
+                  Dendrogram from notebook — merge height indicates similarity between groups
+                </figcaption>
+              </figure>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-ink">Evaluation metrics explained</h3>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {METRIC_DEFINITIONS.map((m) => (
+                  <div
+                    key={m.name}
+                    className="rounded-lg border border-border bg-canvas px-4 py-3 text-sm"
+                  >
+                    <p className="font-medium text-ink">{m.name}</p>
+                    <p className="mt-1 text-xs text-muted">
+                      {m.direction} · {m.range}
+                    </p>
+                    <p className="mt-2 text-muted">{m.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-ink">Full comparison (all columns)</h3>
+              <p className="mt-1 text-sm text-muted">
+                Values from saved notebook artifacts. K-Means and DBSCAN tied on composite rank (3.0);
+                K-Means chosen for production scoring.
+              </p>
+              <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+                <table className="w-full min-w-[880px] text-left text-sm">
+                  <thead className="border-b border-border bg-surface">
+                    <tr>
+                      <th className="px-3 py-2 font-medium text-muted">Model</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Silhouette ↑</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Davies–B. ↓</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Calinski–H. ↑</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Clusters</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Noise %</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Rank DB</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Rank Sil</th>
+                      <th className="px-3 py-2 font-medium text-muted text-right">Composite</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.algorithm_comparison.map((row) => (
+                      <tr
+                        key={row.model}
+                        className={
+                          row.model === "K-Means"
+                            ? "bg-surface font-medium"
+                            : "border-t border-border/60"
+                        }
+                      >
+                        <td className="px-3 py-2 text-ink">{row.model}</td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.silhouette?.toFixed(4) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.davies_bouldin?.toFixed(4) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.calinski_harabasz?.toFixed(2) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.n_clusters ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.noise_pct != null ? row.noise_pct.toFixed(2) : "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.rank_db?.toFixed(1) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.rank_sil?.toFixed(1) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono tabular-nums">
+                          {row.composite_rank?.toFixed(1) ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <AlgorithmComparisonChart data={data.algorithm_comparison} />
           </div>
         </SectionPanel>
@@ -387,7 +573,9 @@ export function ModelPageClient() {
               </div>
             </div>
             <div className="space-y-4">
-              {data.personas.map((p) => (
+              {data.personas.map((p) => {
+                const detail = PERSONA_DETAILS[p.cluster_id];
+                return (
                 <article
                   key={p.cluster_id}
                   className="rounded-lg border border-border p-5"
@@ -400,12 +588,21 @@ export function ModelPageClient() {
                       aria-hidden
                     />
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-ink">{p.persona_name}</h3>
+                      <h3 className="font-semibold text-ink">
+                        Cluster {p.cluster_id} — {p.persona_name}
+                      </h3>
                       <p className="mt-1 text-sm text-muted">
-                        Cluster {p.cluster_id} · {p.customer_count.toLocaleString()} customers (
-                        {p.pct_of_base}% of base)
+                        {p.customer_count.toLocaleString()} customers ({p.pct_of_base}% of base)
+                        {detail ? ` · Priority: ${detail.priority}` : ""}
                       </p>
-                      <p className="mt-3 max-w-prose text-sm text-ink">{p.narrative}</p>
+                      {detail && (
+                        <p className="mt-2 text-sm font-medium text-ink">
+                          In short: {detail.in_short}
+                        </p>
+                      )}
+                      <p className="mt-3 max-w-prose text-sm text-ink">
+                        {detail?.body ?? p.narrative}
+                      </p>
                       {(p.high_features.length > 0 || p.low_features.length > 0) && (
                         <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
                           {p.high_features.length > 0 && (
@@ -426,13 +623,15 @@ export function ModelPageClient() {
                           )}
                         </dl>
                       )}
-                      <p className="mt-3 text-sm font-medium text-ink">
-                        Recommended action: {p.recommended_action}
+                      <p className="mt-3 text-sm text-ink">
+                        <span className="font-medium">Recommended focus:</span>{" "}
+                        {detail?.recommended_focus ?? p.recommended_action}
                       </p>
                     </div>
                   </div>
                 </article>
-              ))}
+              );
+              })}
             </div>
             <p className="text-sm">
               <Link href="/personas" className="font-medium text-primary hover:underline">

@@ -80,6 +80,8 @@ export type AlgorithmRow = {
   calinski_harabasz: number | null;
   n_clusters: number | null;
   noise_pct: number | null;
+  rank_db: number | null;
+  rank_sil: number | null;
   composite_rank: number | null;
 };
 
