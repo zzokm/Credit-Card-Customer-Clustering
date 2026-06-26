@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   CartesianGrid,
-  ReferenceDot,
   ResponsiveContainer,
   Scatter,
   ScatterChart,
@@ -13,13 +12,54 @@ import {
   ZAxis,
 } from "recharts";
 import { fetchClusterMap } from "@/lib/api";
-import type { ClusterPoint } from "@/lib/types";
-import { PERSONA_COLORS } from "@/lib/personas";
+import type { ClusterPoint, SegmentResult } from "@/lib/types";
+import { PERSONA_COLORS, personaHighlightColor } from "@/lib/personas";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { useSegmentHighlight } from "@/context/segment-highlight-context";
 
 type ScatterDatum = ClusterPoint & { fill: string };
+
+type LookupScatterDatum = {
+  x: number;
+  y: number;
+  fill: string;
+  isLookup: true;
+};
+
+function LookupTooltipContent({ result }: { result: SegmentResult }) {
+  return (
+    <div className="max-w-[220px] rounded-md border border-border bg-canvas px-3 py-2 text-xs shadow-sm">
+      <p className="font-semibold text-ink">{result.segment_name}</p>
+      <p className="mt-1 text-muted">Cluster {result.cluster_id}</p>
+      <p className="mt-2 line-clamp-3 text-ink">{result.recommended_action}</p>
+      <dl className="mt-2 space-y-1 border-t border-border/60 pt-2">
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted">Utilization</dt>
+          <dd className="font-mono tabular-nums text-ink">
+            {(result.derived.utilization_rate * 100).toFixed(1)}%
+          </dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted">Payment / min</dt>
+          <dd className="font-mono tabular-nums text-ink">
+            {result.derived.payment_to_min_ratio.toFixed(2)}
+          </dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted">Full payer</dt>
+          <dd className="text-ink">{result.derived.full_payer_flag ? "Yes" : "No"}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted">PCA</dt>
+          <dd className="font-mono tabular-nums text-ink">
+            ({result.pca.x.toFixed(2)}, {result.pca.y.toFixed(2)})
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
 
 export function ClusterScatter() {
   const [points, setPoints] = useState<ClusterPoint[]>([]);
@@ -58,15 +98,16 @@ export function ClusterScatter() {
     }));
   }, [points, filter]);
 
-  const highlightPoint = useMemo(() => {
-    if (!highlight) return null;
-    return {
-      x: highlight.pca.x,
-      y: highlight.pca.y,
-      cluster_id: highlight.cluster_id,
-      persona_name: highlight.segment_name,
-      fill: PERSONA_COLORS[highlight.cluster_id],
-    };
+  const lookupScatterData = useMemo((): LookupScatterDatum[] => {
+    if (!highlight) return [];
+    return [
+      {
+        x: highlight.pca.x,
+        y: highlight.pca.y,
+        fill: personaHighlightColor(highlight.cluster_id),
+        isLookup: true,
+      },
+    ];
   }, [highlight]);
 
   return (
@@ -142,11 +183,15 @@ export function ClusterScatter() {
                 cursor={{ strokeDasharray: "3 3" }}
                 content={({ active, payload }) => {
                   if (!active || !payload?.[0]) return null;
-                  const p = payload[0].payload as ScatterDatum;
+                  const p = payload[0].payload as ScatterDatum | LookupScatterDatum;
+                  if ("isLookup" in p && p.isLookup && highlight) {
+                    return <LookupTooltipContent result={highlight} />;
+                  }
+                  const point = p as ScatterDatum;
                   return (
                     <div className="rounded-md border border-border bg-canvas px-3 py-2 text-xs shadow-sm">
-                      <p className="font-medium text-ink">{p.persona_name}</p>
-                      <p className="text-muted">Balance: ${p.balance.toLocaleString()}</p>
+                      <p className="font-medium text-ink">{point.persona_name}</p>
+                      <p className="text-muted">Balance: ${point.balance.toLocaleString()}</p>
                     </div>
                   );
                 }}
@@ -158,20 +203,13 @@ export function ClusterScatter() {
                   if (payload) setSelected(payload);
                 }}
               />
-              {highlightPoint && (
-                <ReferenceDot
-                  x={highlightPoint.x}
-                  y={highlightPoint.y}
-                  r={9}
-                  fill={highlightPoint.fill}
+              {lookupScatterData.length > 0 && (
+                <Scatter
+                  data={lookupScatterData}
+                  fill={lookupScatterData[0].fill}
                   stroke="oklch(1 0 0)"
                   strokeWidth={2}
-                  label={{
-                    value: "Lookup",
-                    position: "top",
-                    fontSize: 10,
-                    fill: "oklch(0.22 0.02 220)",
-                  }}
+                  legendType="none"
                 />
               )}
             </ScatterChart>
