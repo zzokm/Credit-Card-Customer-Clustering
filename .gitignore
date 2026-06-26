@@ -1,0 +1,64 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Env & secrets (keep examples)
+.env
+.env.local
+.env.production
+.env.*.local
+api/.env
+dashboard/.env.local
+dashboard/.env.production
+deploy.env
+
+# IDE / local tooling
+.idea/
+.cursor/
+.impeccable/
+__MACOSX/
+dashboard/AGENTS.md
+dashboard/CLAUDE.md
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# TypeScript
+*.tsbuildinfo
+
+# Research, coursework, and reference (not deployed)
+Dataset/
+Refrence Code From Kaggle/
+Paper Using The Same Dataset/
+Epsilon AI Criteria/
+visuals/
+notebook_modules/
+*.ipynb
+_executed.ipynb
+generate_notebook.py
+notebook_functions.py
+/requirements.txt
+
+# Notebook / EDA outputs not required for inference API
+artifacts/plots/
+artifacts/temp/
+
+# Docker local overrides
+docker-compose.override.yml

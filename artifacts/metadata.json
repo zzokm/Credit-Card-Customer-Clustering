@@ -1,0 +1,157 @@
+{
+  "best_model": "K-Means",
+  "init_method": "k-means++",
+  "n_clusters": 3,
+  "hyperparameters": {
+    "kmeans_k": 3,
+    "k_selection_method": "multi_metric_voting",
+    "k_voting_range": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "dbscan_eps": 2.2402363117207824,
+    "dbscan_min_samples": 4,
+    "agg_k": 3
+  },
+  "k_voting_summary": [
+    {
+      "k": 3,
+      "silhouette": 0.2009,
+      "davies_bouldin": 1.6939,
+      "calinski_harabasz": 2064.1948,
+      "rank_silhouette": 1.0,
+      "rank_davies_bouldin": 3.0,
+      "rank_calinski_harabasz": 1.0,
+      "Total_Rank": 5.0
+    },
+    {
+      "k": 4,
+      "silhouette": 0.1817,
+      "davies_bouldin": 1.7085,
+      "calinski_harabasz": 1833.6896,
+      "rank_silhouette": 3.0,
+      "rank_davies_bouldin": 4.0,
+      "rank_calinski_harabasz": 2.0,
+      "Total_Rank": 9.0
+    },
+    {
+      "k": 5,
+      "silhouette": 0.1782,
+      "davies_bouldin": 1.7164,
+      "calinski_harabasz": 1653.0914,
+      "rank_silhouette": 5.0,
+      "rank_davies_bouldin": 5.0,
+      "rank_calinski_harabasz": 3.0,
+      "Total_Rank": 13.0
+    },
+    {
+      "k": 6,
+      "silhouette": 0.187,
+      "davies_bouldin": 1.614,
+      "calinski_harabasz": 1563.8865,
+      "rank_silhouette": 2.0,
+      "rank_davies_bouldin": 1.0,
+      "rank_calinski_harabasz": 4.0,
+      "Total_Rank": 7.0
+    },
+    {
+      "k": 7,
+      "silhouette": 0.1802,
+      "davies_bouldin": 1.6554,
+      "calinski_harabasz": 1442.9724,
+      "rank_silhouette": 4.0,
+      "rank_davies_bouldin": 2.0,
+      "rank_calinski_harabasz": 5.0,
+      "Total_Rank": 11.0
+    }
+  ],
+  "log1p_columns": [
+    "BALANCE",
+    "PURCHASES",
+    "MINIMUM_PAYMENTS",
+    "CASH_ADVANCE",
+    "PAYMENTS",
+    "ONEOFF_PURCHASES",
+    "INSTALLMENTS_PURCHASES",
+    "AVG_PURCHASE_VALUE",
+    "PAYMENT_TO_MIN_RATIO"
+  ],
+  "feature_names": [
+    "PURCHASES",
+    "ONEOFF_PURCHASES",
+    "INSTALLMENTS_PURCHASES",
+    "CASH_ADVANCE",
+    "PURCHASES_FREQUENCY",
+    "ONEOFF_PURCHASES_FREQUENCY",
+    "CASH_ADVANCE_FREQUENCY",
+    "CASH_ADVANCE_TRX",
+    "PURCHASES_TRX",
+    "BALANCE",
+    "BALANCE_FREQUENCY",
+    "CREDIT_LIMIT",
+    "PAYMENTS",
+    "MINIMUM_PAYMENTS",
+    "PRC_FULL_PAYMENT",
+    "TENURE",
+    "full_payer_flag",
+    "UTILIZATION_RATE",
+    "PAYMENT_TO_MIN_RATIO"
+  ],
+  "persona_map": {
+    "1": "The Active Transactors",
+    "2": "The Revolvers (High-Risk)",
+    "0": "The Dormant/Inactive"
+  },
+  "persona_actions": {
+    "The Active Transactors": "Eligible for limit increases and loyalty micro-loan offers",
+    "The Revolvers (High-Risk)": "Risk mitigation \u2014 limit holds, higher APR tiers, cash-advance monitoring",
+    "The Big Ticket Spenders": "Targeted big-ticket financing and premium limit review",
+    "The Dormant/Inactive": "Re-engagement campaigns and dormancy risk profiling"
+  },
+  "metrics": {
+    "silhouette": {
+      "K-Means": 0.2008697070922788,
+      "DBSCAN": 0.1795132563855676,
+      "Agglomerative": 0.16030927892945043
+    },
+    "davies_bouldin": {
+      "K-Means": 1.6938898561564428,
+      "DBSCAN": 0.8638026172491113,
+      "Agglomerative": 1.8045028368799043
+    },
+    "calinski_harabasz": {
+      "K-Means": 2064.194848028842,
+      "DBSCAN": 3.732853466316473,
+      "Agglomerative": 1439.8996368501812
+    },
+    "n_clusters": {
+      "K-Means": 3,
+      "DBSCAN": 2,
+      "Agglomerative": 3
+    },
+    "noise_pct": {
+      "K-Means": 0.0,
+      "DBSCAN": 4.067039106145254,
+      "Agglomerative": 0.0
+    },
+    "rank_db": {
+      "K-Means": 2.0,
+      "DBSCAN": 1.0,
+      "Agglomerative": 3.0
+    },
+    "rank_sil": {
+      "K-Means": 1.0,
+      "DBSCAN": 2.0,
+      "Agglomerative": 3.0
+    },
+    "composite_rank": {
+      "K-Means": 3.0,
+      "DBSCAN": 3.0,
+      "Agglomerative": 6.0
+    }
+  },
+  "plotly_static_mode_note": "Set PLOTLY_STATIC_MODE=1 for static notebook exports"
+}

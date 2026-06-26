@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: oklch(1 0 0);
+  --surface: oklch(0.97 0.008 220);
+  --ink: oklch(0.22 0.02 220);
+  --muted: oklch(0.42 0.015 220);
+  --primary: oklch(0.5 0.14 215);
+  --primary-hover: oklch(0.44 0.14 215);
+  --border: oklch(0.22 0.02 220 / 0.12);
+  --ring: oklch(0.5 0.14 215 / 0.4);
+  --persona-0: oklch(0.55 0.06 250);
+  --persona-1: oklch(0.62 0.14 165);
+  --persona-2: oklch(0.58 0.16 25);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --z-sticky: 10;
+  --z-drawer: 40;
+  --z-drawer-backdrop: 30;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-border: var(--border);
+  --font-sans: var(--font-source-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-source-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+::selection {
+  background: oklch(0.5 0.14 215 / 0.2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

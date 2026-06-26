@@ -1,0 +1,47 @@
+# Git & IDE
+.git
+.github
+.cursor
+.impeccable
+.vscode
+.idea
+
+# Python
+.venv
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+*.egg-info
+
+# Node / Next
+node_modules
+dashboard/node_modules
+dashboard/.next
+dashboard/out
+npm-debug.log*
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+!**/.env.production.example
+!deploy.env.example
+
+# Research, notebooks, and local-only assets (not needed in images)
+Dataset/
+Refrence Code From Kaggle/
+Paper Using The Same Dataset/
+Epsilon AI Criteria/
+__MACOSX/
+visuals/
+notebook_modules/
+*.ipynb
+_executed.ipynb
+generate_notebook.py
+notebook_functions.py
+/requirements.txt
+
+# Inference image only needs runtime artifacts (plots/temp excluded)
+artifacts/plots/
+artifacts/temp/

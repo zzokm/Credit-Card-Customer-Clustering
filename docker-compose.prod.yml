@@ -1,0 +1,77 @@
+# Production stack for credit.zokm.me (VPS)
+#
+#   Host :5465  →  web:3001   (Next.js Segment Console)
+#   /api/v1/*   →  api:8001   (FastAPI + joblib model, internal network only)
+#
+# Usage on VPS:
+#   cp deploy.env.example deploy.env
+#   docker compose -f docker-compose.prod.yml --env-file deploy.env up -d --build
+
+name: credit-card-clustering
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    expose:
+      - "8001"
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8001
+      API_RELOAD: "false"
+      API_WORKERS: ${API_WORKERS:-2}
+      API_LOG_LEVEL: warning
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://credit.zokm.me,http://credit.zokm.me:5465}
+      ARTIFACTS_DIR: /app/artifacts
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - segment
+
+  web:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+      args:
+        API_PROXY_URL: ${API_PROXY_URL:-http://api:8001}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+    ports:
+      - "${WEB_PORT:-5465}:3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: 0.0.0.0
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/lookup').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+    restart: unless-stopped
+    networks:
+      - segment
+
+networks:
+  segment:
+    driver: bridge

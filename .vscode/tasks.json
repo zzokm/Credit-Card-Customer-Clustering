@@ -1,0 +1,403 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: Full project",
+      "dependsOn": ["Setup: Python venv", "Setup: API deps", "Setup: Dashboard deps", "Setup: Root deps", "Setup: Env files"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Setup: Python venv",
+      "type": "shell",
+      "command": "python -m venv .venv",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+    {
+      "label": "Setup: API deps",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python -m pip install -r api/requirements.txt",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\python -m pip install -r api/requirements.txt"
+      },
+      "linux": {
+        "command": "${workspaceFolder}/.venv/bin/python -m pip install -r api/requirements.txt"
+      },
+      "osx": {
+        "command": "${workspaceFolder}/.venv/bin/python -m pip install -r api/requirements.txt"
+      },
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Setup: Dashboard deps",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}/dashboard" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Setup: Root deps",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Setup: Env files",
+      "type": "shell",
+      "command": "powershell -NoProfile -Command \"if (!(Test-Path api/.env)) { Copy-Item api/.env.example api/.env }; if (!(Test-Path dashboard/.env.local)) { Copy-Item dashboard/.env.example dashboard/.env.local }\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+
+    {
+      "label": "Dev: Full stack",
+      "dependsOn": ["Dev: API", "Dev: Dashboard"],
+      "dependsOrder": "parallel",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: API",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\dev-api.ps1"
+      ],
+      "windows": {
+        "command": "powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\scripts\\dev-api.ps1"
+        ]
+      },
+      "linux": {
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": ["serve.py"],
+        "options": {
+          "cwd": "${workspaceFolder}/api",
+          "env": {
+            "API_HOST": "127.0.0.1",
+            "API_PORT": "8001",
+            "API_RELOAD": "true",
+            "API_WORKERS": "1",
+            "API_LOG_LEVEL": "info",
+            "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+            "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+          }
+        }
+      },
+      "osx": {
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": ["serve.py"],
+        "options": {
+          "cwd": "${workspaceFolder}/api",
+          "env": {
+            "API_HOST": "127.0.0.1",
+            "API_PORT": "8001",
+            "API_RELOAD": "true",
+            "API_WORKERS": "1",
+            "API_LOG_LEVEL": "info",
+            "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+            "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+          }
+        }
+      },
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "API_HOST": "127.0.0.1",
+          "API_PORT": "8001",
+          "API_RELOAD": "true",
+          "API_WORKERS": "1",
+          "API_LOG_LEVEL": "info",
+          "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+          "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uvicorn",
+        "pattern": { "regexp": "^.*$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^(\\[dev-api\\].*Starting API|INFO:.*Started server process|INFO:.*Uvicorn running).*$",
+          "endsPattern": "^(INFO:.*Application startup complete|INFO:.*Uvicorn running).*$"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers",
+        "clear": true
+      }
+    },
+    {
+      "label": "Dev: Dashboard",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/dashboard",
+        "env": {
+          "API_PROXY_URL": "http://127.0.0.1:8001"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "nextjs",
+        "pattern": { "regexp": "^.*$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*(started server|Ready in|Local:).*$",
+          "endsPattern": "^.*(Ready in|Local:).*$"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers",
+        "clear": true
+      }
+    },
+
+    {
+      "label": "Build: Production (dashboard)",
+      "type": "shell",
+      "command": "npm run build:prod",
+      "options": {
+        "cwd": "${workspaceFolder}/dashboard",
+        "env": {
+          "API_PROXY_URL": "http://127.0.0.1:8001"
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Build: Production (full)",
+      "dependsOn": ["Build: Production (dashboard)"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Prod: Full stack",
+      "dependsOn": ["Prod: API", "Prod: Dashboard"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Prod: API",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\prod-api.ps1"
+      ],
+      "windows": {
+        "command": "powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\scripts\\prod-api.ps1"
+        ]
+      },
+      "linux": {
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": ["serve.py"],
+        "options": {
+          "cwd": "${workspaceFolder}/api",
+          "env": {
+            "API_HOST": "0.0.0.0",
+            "API_PORT": "8001",
+            "API_RELOAD": "false",
+            "API_WORKERS": "2",
+            "API_LOG_LEVEL": "warning",
+            "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+            "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+          }
+        }
+      },
+      "osx": {
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": ["serve.py"],
+        "options": {
+          "cwd": "${workspaceFolder}/api",
+          "env": {
+            "API_HOST": "0.0.0.0",
+            "API_PORT": "8001",
+            "API_RELOAD": "false",
+            "API_WORKERS": "2",
+            "API_LOG_LEVEL": "warning",
+            "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+            "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+          }
+        }
+      },
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "API_HOST": "0.0.0.0",
+          "API_PORT": "8001",
+          "API_RELOAD": "false",
+          "API_WORKERS": "2",
+          "API_LOG_LEVEL": "warning",
+          "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+          "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uvicorn",
+        "pattern": { "regexp": "^.*$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^(\\[dev-api\\].*Starting API|INFO:.*Started server process|INFO:.*Uvicorn running).*$",
+          "endsPattern": "^(INFO:.*Application startup complete|INFO:.*Uvicorn running).*$"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "prod-servers"
+      }
+    },
+    {
+      "label": "Prod: Dashboard",
+      "type": "shell",
+      "command": "npm run start:prod",
+      "dependsOn": ["Build: Production (dashboard)"],
+      "options": {
+        "cwd": "${workspaceFolder}/dashboard",
+        "env": {
+          "NODE_ENV": "production",
+          "API_PROXY_URL": "http://127.0.0.1:8001"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "nextjs",
+        "pattern": { "regexp": "^.*$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*(started server|Ready|Local:).*$",
+          "endsPattern": "^.*(Ready|started server).*$"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "prod-servers"
+      }
+    },
+
+    {
+      "label": "Docker: Build",
+      "type": "shell",
+      "command": "docker compose build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Docker: Up (dev)",
+      "type": "shell",
+      "command": "docker compose up -d",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Docker: Up (prod)",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.prod.yml up -d --build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Docker: Down",
+      "type": "shell",
+      "command": "docker compose down && docker compose -f docker-compose.prod.yml down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Docker: Logs",
+      "type": "shell",
+      "command": "docker compose logs -f",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+
+    {
+      "label": "Lint: Dashboard",
+      "type": "shell",
+      "command": "npm run lint",
+      "options": { "cwd": "${workspaceFolder}/dashboard" },
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Typecheck: Dashboard",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "options": { "cwd": "${workspaceFolder}/dashboard" },
+      "problemMatcher": ["$tsc"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Test: API health",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python -c \"import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health').read().decode())\"",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\python -c \"import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health').read().decode())\""
+      },
+      "linux": {
+        "command": "${workspaceFolder}/.venv/bin/python -c \"import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health').read().decode())\""
+      },
+      "osx": {
+        "command": "${workspaceFolder}/.venv/bin/python -c \"import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health').read().decode())\""
+      },
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Notebook: Execute pipeline",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python -m jupyter nbconvert --to notebook --execute credit_card_customer_clustering.ipynb --output _executed.ipynb",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\python -m jupyter nbconvert --to notebook --execute credit_card_customer_clustering.ipynb --output _executed.ipynb"
+      },
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    }
+  ]
+}

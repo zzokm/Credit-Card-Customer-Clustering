@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: FastAPI (API)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload", "--host", "127.0.0.1", "--port", "8001"],
+      "cwd": "${workspaceFolder}/api",
+      "env": {
+        "API_RELOAD": "true",
+        "CORS_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001",
+        "ARTIFACTS_DIR": "${workspaceFolder}/artifacts"
+      },
+      "jinja": true,
+      "justMyCode": true
+    },
+    {
+      "name": "Debug: Next.js (Dashboard)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/dashboard",
+      "env": {
+        "API_PROXY_URL": "http://127.0.0.1:8001"
+      },
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "- Local:\\s+(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug: Full stack",
+      "configurations": ["Debug: FastAPI (API)", "Debug: Next.js (Dashboard)"],
+      "stopAll": true
+    }
+  ]
+}

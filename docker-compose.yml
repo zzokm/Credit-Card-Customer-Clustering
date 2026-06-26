@@ -1,0 +1,50 @@
+# Local Docker stack (mirrors production routing)
+#
+#   localhost:3001  →  web
+#   /api/v1/*       →  api:8001 (proxied by Next.js; API also on :8001 for docs/debug)
+
+name: credit-card-clustering-dev
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8001
+      API_RELOAD: "false"
+      API_WORKERS: 2
+      CORS_ORIGINS: http://localhost:3001,http://127.0.0.1:3001
+      ARTIFACTS_DIR: /app/artifacts
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/v1/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  web:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+      args:
+        API_PROXY_URL: http://api:8001
+        NEXT_PUBLIC_API_URL: ""
+    ports:
+      - "3001:3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: 0.0.0.0
