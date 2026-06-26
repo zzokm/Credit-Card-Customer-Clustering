@@ -95,22 +95,6 @@ function KVoteTable({ rows, winnerK }: { rows: KVoteRow[]; winnerK: number }) {
   );
 }
 
-function FeatureList({ items, muted }: { items: string[]; muted?: boolean }) {
-  return (
-    <ul className="flex flex-wrap gap-1.5">
-      {items.map((f) => (
-        <li
-          key={f}
-          className={`rounded px-2 py-0.5 font-mono text-[11px] ${
-            muted ? "bg-surface text-muted" : "bg-surface text-ink"
-          }`}
-        >
-          {f}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export function ModelPageClient() {
   const [data, setData] = useState<ModelDetails | null>(null);
@@ -224,7 +208,7 @@ export function ModelPageClient() {
         <SectionPanel
           id="features"
           title="Features & engineering"
-          description={`${data.features.api_input_count} API inputs expand to ${data.features.model_features.length} scaled model features after engineering and log1p transforms.`}
+          description="Raw dataset column definitions and engineered features used at inference time."
         >
           <div className="space-y-10">
             <div>
@@ -283,37 +267,6 @@ export function ModelPageClient() {
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </div>
-
-            <div className="space-y-6 border-t border-border pt-8">
-              <div>
-                <h3 className="text-sm font-semibold text-ink">Spending behavior (API inputs)</h3>
-                <div className="mt-2">
-                  <FeatureList items={data.features.groups.spending} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-ink">Account & payments (API inputs)</h3>
-                <div className="mt-2">
-                  <FeatureList items={data.features.groups.account} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-ink">log1p transform</h3>
-                <p className="mt-1 text-sm text-muted">
-                  Applied to skewed, zero-inflated columns before scaling — same order as the
-                  notebook pipeline.
-                </p>
-                <div className="mt-2">
-                  <FeatureList items={data.features.log1p_columns} muted />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-ink">Full model feature set</h3>
-                <div className="mt-2">
-                  <FeatureList items={data.features.model_features} />
-                </div>
               </div>
             </div>
           </div>
