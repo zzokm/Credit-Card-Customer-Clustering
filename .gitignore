@@ -49,11 +49,8 @@ Refrence Code From Kaggle/
 Paper Using The Same Dataset/
 Epsilon AI Criteria/
 visuals/
-notebook_modules/
 *.ipynb
 _executed.ipynb
-generate_notebook.py
-notebook_functions.py
 /requirements.txt
 
 # Notebook / EDA outputs not required for inference API
